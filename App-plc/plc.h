@@ -39,7 +39,7 @@ typedef struct task {
     void (*func)(unsigned long); 
 } task_t;
 
-task_t tasks[TASK_N] = {{.priority = 10, .func = RESOURCE1_run__, .w_pin_reqs = {{.pin = 0, .dir = 1, .state = 0}}}}; //gen
+task_t tasks[TASK_N] = {{.priority = 1, .func = RESOURCE1_run__, .w_pin_reqs = {{.pin = PICO_DEFAULT_LED_PIN, .dir = 1, .state = 0}}}}; //gen
 
 bool *__MX0_0_2_13 = &tasks[0].w_pin_reqs[0].state; //gen
 
