@@ -1,17 +1,30 @@
 import csv
 import os
 
+def find_locals(content: list[str]) -> list[dict[str]]:
+    result = []
+    curr_prog = ''
+    for line in content:
+        if line.find('PROGRAM') != -1:
+            curr_prog = line.split()[1]
+            result.append({curr_prog: []})
+        if line.find('AT') != -1:
+            result
+
 def csv_to_header_parse(csv_file_path, header_folder_path, header_file_name):
     
     with open(csv_file_path, 'r') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=';')
         data = list(csv_reader)
-    print(data)
+    with open("plc.st") as f:
+        content = list(filter(None, f.read().split('\n')))
+
     if not os.path.exists(header_folder_path):
         os.makedirs(header_folder_path)
 
-    header_file_path = os.path.join(header_folder_path, header_file_name)
 
+
+    header_file_path = os.path.join(header_folder_path, header_file_name)
     with open(header_file_path, 'w') as header_file:
         header_file.write(f'#ifndef {header_file_name.upper().replace(".", "_")}\n')
         header_file.write(f'#define {header_file_name.upper().replace(".", "_")}\n\n')
