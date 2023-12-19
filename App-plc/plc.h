@@ -57,11 +57,11 @@ task_t tasks[TASK_N] = {
         .r_pin_reqs = {},
     },
 };
-bool* MX0_0_2_13 = &(tasks[0].w_pin_reqs[TASK1__MX0_0_2_13].state);  
+uint8_t* __MX0_0_2_13 = &(tasks[0].w_pin_reqs[TASK1__MX0_0_2_13].state);  
 // from csv какой тип будет  ^ (w или r)
 
-const uint8_t r_task_sizes[TASK_N] = {TASK1_N_W_PIN};
-const uint8_t w_task_sizes[TASK_N] = {TASK1_N_R_PIN};
+const uint8_t r_task_sizes[TASK_N] = {TASK1_N_R_PIN};
+const uint8_t w_task_sizes[TASK_N] = {TASK1_N_W_PIN};
 
 // #endif
 

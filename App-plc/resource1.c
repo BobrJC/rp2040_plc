@@ -11,7 +11,7 @@ extern unsigned long long common_ticktime__;
 
 #include "accessor.h"
 #include "POUS.h"
-
+#include <stdio.h>
 #include "config.h"
 
 #include "POUS.c"
@@ -30,6 +30,7 @@ void RESOURCE1_init__(void) {
 
 void RESOURCE1_run__(unsigned long tick) {
   TASK0 = !(tick % 1);
+  printf("RESOUCE");
   if (TASK0) {
     PROGRAM0_body__(&INSTANCE0);
   }

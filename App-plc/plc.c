@@ -4,6 +4,9 @@
 #include <errno.h>
 #include "plc.h"
 #include "stack_macros.h"
+#include "iec_types.h"
+
+extern IEC_TIME __CURRENT_TIME;
 
 void init_freertos()
 {
@@ -14,6 +17,7 @@ void init_freertos()
 
 void __init_0()
 {
+    printf("INIT\r\n");
     //xSemaphoreTake(xMutex, portMAX_DELAY);
     for (int i = 0; i < TASK_N; i++)
     {
@@ -41,12 +45,14 @@ void __retrieve_0()
     }
 }
 
-void __run_tasks(unsigned long *tick)
+void __run_tasks(unsigned long tick)
 {
-    
+    __CURRENT_TIME.tv_sec = tick/1000;
+    __CURRENT_TIME.tv_nsec = (tick % 1000) * 1000000;
+
     for (int i = 0; i < TASK_N; i++)
     {
-        tasks[i].func(*tick++);
+        tasks[i].func(tick);
     } 
 }
 
@@ -57,6 +63,7 @@ void __publish_0()
         uint8_t w_task_size = w_task_sizes[i];
         for (int j = 0; j < w_task_sizes[i]; j++)
         {
+            printf("%i\r\n", tasks[i].w_pin_reqs[j].state);
             gpio_put(tasks[i].w_pin_reqs[j].pin, tasks[i].w_pin_reqs[j].state);
         }
     }

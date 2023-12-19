@@ -33,7 +33,7 @@
 
 
 #include "accessor.h"
-
+#include <stdio.h>
 
 
 // FUNCTION_BLOCK R_TRIG
