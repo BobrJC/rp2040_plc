@@ -2,7 +2,20 @@
     "files.associations": {
         "stdlib.h": "c",
         "iec_types.h": "c",
-        "queue.h": "c"
+        "queue.h": "c",
+        "stack_macros.h": "c",
+        "charconv": "c",
+        "chrono": "c",
+        "optional": "c",
+        "format": "c",
+        "ratio": "c",
+        "system_error": "c",
+        "array": "c",
+        "functional": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "structs.h": "c"
     },
     "workbench.colorCustomizations": {
         "activityBar.activeBackground": "#3399ff",

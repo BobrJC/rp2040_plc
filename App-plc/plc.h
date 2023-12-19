@@ -1,46 +1,68 @@
 // #ifndef PLCH
 // #define PLCH
 #pragma once
-
-#define R_REQ_N 0 //gen
-#define W_REQ_N 1 //gen
-#define TASK_N 1 //gen
-#include "stdbool.h"
-#include "stdint.h"
+#include "structs.h"
 #include "pico/stdlib.h"
 #include <FreeRTOS.h>
 #include <task.h>
 #include <queue.h>
 #include <semphr.h>
 
-SemaphoreHandle_t xMutex;
+//SemaphoreHandle_t xMutex;
 
-extern void RESOURCE1_run__(unsigned long tick); //gen
+#define TASK_N 1 // from script (для циклов)
+#define MAX_REQS_N 10
 
-typedef struct r_request
-{
-    uint32_t pin;
-    bool dir;
-    bool state;
-} r_request_t;
+// ---------- TASK 1 ----------
+#define TASK1_PRIORITY 10 // from resource_X.c
+#define TASK1_RUN RESOURCE1_run__ // from resource_X.c
+#define TASK1_N_W_PIN 1 // from csv (нужно для циклов)
+#define TASK1_N_R_PIN 0 // from csv
 
-typedef struct w_request
-{
-    uint32_t pin;
-    bool dir;
-    bool state;
-} w_request_t;
+#define TASK1_R_PIN_1 9 // from csv
+#define TASK1_R_PIN_1_STATE 0 // default
 
+#define TASK1_W_PIN_1 0 // from csv
+#define TASK1_W_PIN_1_STATE 0 // default
+
+#define TASK1__MX0_0_2_13 0 // from csv
+
+// ---------- TASK 2 ----------
+#define TASK2_PRIORITY 2 // from resource_X.c
+#define TASK2_RUN RESOURCE2_run__ // from resource_X.c
+#define TASK2_N_W_PIN 1 // from csv (нужно для циклов)
+#define TASK2_N_R_PIN 0 // from csv
+
+#define TASK2_R_PIN_1 9 // from csv
+#define TASK2_R_PIN_1_STATE 0 // default
+
+#define TASK2_W_PIN_1 0 // from csv
+#define TASK2_W_PIN_1_STATE 0 // default
+
+#define TASK2__MX0_0_2_0 0 // from csv
+
+extern void TASK1_RUN(unsigned long tick); //gen
 
 typedef struct task {
-    uint8_t priority;
-    w_request_t w_pin_reqs[W_REQ_N]; 
-    r_request_t r_pin_reqs[R_REQ_N]; 
+    const uint8_t priority;
+    w_request_t w_pin_reqs[MAX_REQS_N]; 
+    r_request_t r_pin_reqs[MAX_REQS_N]; 
     void (*func)(unsigned long); 
 } task_t;
 
-task_t tasks[TASK_N] = {{.priority = 1, .func = RESOURCE1_run__, .w_pin_reqs = {{.pin = PICO_DEFAULT_LED_PIN, .dir = 1, .state = 0}}}}; //gen
+task_t tasks[TASK_N] = {
+    {
+        .priority = TASK1_PRIORITY, 
+        .func = TASK1_RUN, 
+        .w_pin_reqs = {{TASK1_W_PIN_1, TASK1_W_PIN_1_STATE},},
+        .r_pin_reqs = {},
+    },
+};
+bool* MX0_0_2_13 = &(tasks[0].w_pin_reqs[TASK1__MX0_0_2_13].state);  
+// from csv какой тип будет  ^ (w или r)
 
-bool *__MX0_0_2_13 = &tasks[0].w_pin_reqs[0].state; //gen
+const uint8_t r_task_sizes[TASK_N] = {TASK1_N_W_PIN};
+const uint8_t w_task_sizes[TASK_N] = {TASK1_N_R_PIN};
 
 // #endif
+
