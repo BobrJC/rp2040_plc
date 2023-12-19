@@ -42,8 +42,7 @@ void PROGRAM0_init__(PROGRAM0 *data__, BOOL retain) {
 
 // Code part
 void PROGRAM0_body__(PROGRAM0 *data__) {
-  // Initialise TEMP variables
-  printf("LOCALVARE0 %i", __GET_LOCATED(data__->LOCALVAR0,));
+  // Initialise TEMP variable
 
   __SET_VAR(data__->,_TMP_NOT1_OUT,,!(__GET_LOCATED(data__->LOCALVAR0,)));
   __SET_VAR(data__->TON0.,IN,,__GET_VAR(data__->_TMP_NOT1_OUT,));
