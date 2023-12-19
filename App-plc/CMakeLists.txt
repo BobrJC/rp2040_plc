@@ -17,11 +17,12 @@ add_executable(${APP_PLC_NAME}
 # Link to built libraries
 target_link_libraries(${APP_PLC_NAME} LINK_PUBLIC
     pico_stdlib
-    FreeRTOS)
+    FreeRTOS
+    hardware_spi)
 
 # Enable/disable STDIO via USB and UART
 pico_enable_stdio_usb(${APP_PLC_NAME} 1)
-pico_enable_stdio_uart(${APP_PLC_NAME} 1)
+pico_enable_stdio_uart(${APP_PLC_NAME} 0)
 
 # Enable extra build products
 pico_add_extra_outputs(${APP_PLC_NAME})

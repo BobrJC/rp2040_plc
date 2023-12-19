@@ -11,7 +11,7 @@ extern unsigned long long common_ticktime__;
 
 #include "accessor.h"
 #include "POUS.h"
-
+#include <stdio.h>
 #include "config.h"
 
 #include "POUS.c"

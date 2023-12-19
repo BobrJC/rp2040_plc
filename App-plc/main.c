@@ -1,10 +1,16 @@
 #include "iec_types.h"
 #include "stddef.h"
+#include <stdio.h>
+#include <string.h>
+#include "pico/stdlib.h"
+#include <FreeRTOS.h>
+#include <task.h>
+#include <queue.h>
 
-void __init_0();
-void __retrieve_0();
-void __publish_0();
-void __run_tasks(unsigned long* tick);
+extern void __init_0();
+extern void __retrieve_0();
+extern void __publish_0();
+extern void __run(unsigned long* tick);
 void init_freertos();
 IEC_TIME __CURRENT_TIME;
 IEC_BOOL __DEBUG = 0;
@@ -14,15 +20,11 @@ char *PLC_ID = NULL;
 
 int main() 
 {
+    stdio_init_all();
+    sleep_ms(10000);
     init_freertos();
-
-    __init_0();
-    while(1)
-    {
-        unsigned long tick = 0;
-        __retrieve_0();
-        __run_tasks(&tick);
-        __publish_0();
-    }
+    vTaskStartScheduler();
+    sleep_ms(23000);
+    unsigned long tick = 0;
 
 }

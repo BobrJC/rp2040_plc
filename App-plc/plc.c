@@ -4,89 +4,124 @@
 #include <errno.h>
 #include "plc.h"
 #include "stack_macros.h"
+#include "iec_types.h"
+#include "FreeRTOS.h"
+#include "timers.h"
+#include "task.h"
+#include "hardware/spi.h"
+#include "main.h"
 
-void init_freertos()
+extern IEC_TIME __CURRENT_TIME;
+void RESOURCE1_run__(); // gen
+void task1_func(); //gen
+void task2_func(); //gen
+void init_freertos() //full gen
 {
-    TaskHandle_t gpio_task_handle = NULL;
-    TaskHandle_t pico_task_handle = NULL;
-    gpio_init(0);
-    gpio_set_dir(0, GPIO_OUT);
-    gpio_put(0, 1);
-    sleep_ms(1000);
-
-    //xMutex = xQueueCreateMutex(queueQUEUE_TYPE_MUTEX);
+    TaskHandle_t task1 = NULL;
+    TaskHandle_t task2 = NULL;
+    xTaskCreate(task1_func, "1", 256, (void*)0, 7, &task1);
+    xTaskCreate(task2_func, "2", 256, (void*)1, 7, &task2);
 }
 
-void __init_0()
+void __init_spi() //NOT GEN
 {
-    //xSemaphoreTake(xMutex, portMAX_DELAY);
-    for (int i = 0; i < TASK_N; i++)
+    spi_init(SPI_PORT, 500000);
+    gpio_set_function(SCK, GPIO_FUNC_SPI);
+    gpio_set_function(MISO, GPIO_FUNC_SPI);
+    gpio_set_function(CS, GPIO_FUNC_SPI);
+    gpio_init(CS);
+    gpio_set_dir(CS, GPIO_OUT);
+    gpio_put(CS, 1);
+}
+
+void __retrieve_spi() //NOT GEN
+{
+    uint16_t buf16bit;
+    gpio_put (CS, 0);
+    vTaskDelay(1); 
+    spi_read_blocking(SPI_PORT, 0, &buf16bit, 1);
+    buf16bit <<= 8;
+    spi_read_blocking(SPI_PORT, 0, &buf16bit, 1);
+}
+
+void __init_0(int task_id)
+{
+    printf("INIT\r\n");
+
+    for (int j = 0; j < r_task_sizes[task_id]; j++)
     {
-        for (int j = 0; j < r_task_sizes[i]; j++)
-        {
-            switch (tasks[i].r_pin_reqs[j].type)
-            {
-            case GPIO:
-                gpio_init(tasks[i].r_pin_reqs[j].pin);
-                gpio_set_dir(tasks[i].r_pin_reqs[j].pin, false);
-                break;
-            case UART:
-                break;
-            case SPI:
-                break;
-            default:
-                break;
-            }
-            
-        }
-        for (int j = 0; j < w_task_sizes[i]; j++)
-        {
-            switch (tasks[i].w_pin_reqs[j].type)
-            {
-            case GPIO:
-                gpio_init(tasks[i].r_pin_reqs[j].pin);
-                gpio_set_dir(tasks[i].r_pin_reqs[j].pin, false);
-                break;
-            case UART:
-                break;
-            case SPI:
-                break;
-            default:
-                break;
-            }
-        }
+        gpio_init(tasks[task_id].r_pin_reqs[j].pin);
+        gpio_set_dir(tasks[task_id].r_pin_reqs[j].pin, false);
+    }
+    for (int j = 0; j < w_task_sizes[task_id]; j++)
+    {
+        gpio_init(tasks[task_id].w_pin_reqs[j].pin);
+        gpio_set_dir(tasks[task_id].w_pin_reqs[j].pin, true);
     }
 }
 
-void __retrieve_0()
+void __retrieve_0(int task_id)
 {
-    for (int i = 0; i < TASK_N; i++)
+    for (int j = 0; j < r_task_sizes[task_id]; j++)
     {
-        for (int j = 0; j < r_task_sizes[i]; j++)
-        switch (tasks[i].w_pin_reqs[j].type)
-        {
-        case GPIO:
-            tasks[i].r_pin_reqs[j].state = gpio_get(tasks[i].r_pin_reqs[j].pin);
-            break;
-        case UART:
-            break;
-        case SPI:
-            break;
-        default:
-            break;
-        }
+        tasks[task_id].r_pin_reqs[j].state = gpio_get(tasks[task_id].r_pin_reqs[j].pin);
     }
 }
 
-void __run_tasks(unsigned long *tick)
+void __publish_0(int task_id)
 {
-    
+    uint8_t w_task_size = w_task_sizes[task_id];
+    for (int j = 0; j < w_task_sizes[task_id]; j++)
+    {
+        gpio_put(tasks[task_id].w_pin_reqs[j].pin, tasks[task_id].w_pin_reqs[j].state);
+    }
+}
+
+void task1_func(int task_id) //full gen
+{
+    TaskStatus_t xTaskDetails;
+    __init_0(task_id);
+    while (1)
+    {
+        TickType_t tick = xTaskGetTickCount();
+        printf("tick1 %i", tick);
+        __CURRENT_TIME.tv_sec = tick/1000;
+        __CURRENT_TIME.tv_nsec = (tick % 1000) * 1000000;
+        __retrieve_0(task_id);
+        RESOURCE1_run__(tick);
+        __publish_0(task_id);
+        vTaskDelay(5);
+    }
+}
+
+void task2_func(int task_id) //full gen
+{
+    TaskStatus_t xTaskDetails;
+    while (1)
+    {
+        TickType_t tick = xTaskGetTickCount();
+        printf("tick2 %i", tick);
+        __CURRENT_TIME.tv_sec = tick/1000;
+        __CURRENT_TIME.tv_nsec = (tick % 1000) * 1000000;
+        __retrieve_0(task_id);
+        RESOURCE1_run__(tick);
+        __publish_0(task_id);
+        vTaskDelay(5);
+    }
+}
+
+void __run_task1(unsigned long tick)
+{
+    __CURRENT_TIME.tv_sec = tick/1000;
+    __CURRENT_TIME.tv_nsec = (tick % 1000) * 1000000;
+
     for (int i = 0; i < TASK_N; i++)
     {
-        tasks[i].func(*tick++);
+        tasks[i].func(tick);
     } 
 }
 
+<<<<<<< HEAD
 void __publish_0()
 {
     for (int i = 0; i < TASK_N; i++)
@@ -111,6 +146,10 @@ void __publish_0()
     }
     //xSemaphoreGive(xMutex);
 }
+=======
+
+
+>>>>>>> 1496ae99a8cb0d234d2247d85a147d226d807530
 
 void __cleanup_0()
 {
