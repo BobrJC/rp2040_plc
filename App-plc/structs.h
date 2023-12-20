@@ -11,13 +11,13 @@ typedef enum req_types
 typedef struct r_request
 {
     const uint32_t pin;
-    bool state;
+    void* value;
     req_types_t type;
 } r_request_t;
 
 typedef struct w_request
 {
     const uint32_t pin;
-    bool state;
+    void* value;
     req_types_t type;
 } w_request_t;

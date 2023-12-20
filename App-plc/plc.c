@@ -42,8 +42,13 @@ void __retrieve_spi() //NOT GEN
     spi_read_blocking(SPI_PORT, 0, &buf16bit, 1);
     buf16bit <<= 8;
     spi_read_blocking(SPI_PORT, 0, &buf16bit, 1);
+    buf16bit >>= 3;
+    buf16bit = buf16bit*0.25;
 }
-
+void __init_uart()
+{
+    stdio_init_all();
+}
 void __init_0(int task_id)
 {
     printf("INIT\r\n");
@@ -64,7 +69,7 @@ void __retrieve_0(int task_id)
 {
     for (int j = 0; j < r_task_sizes[task_id]; j++)
     {
-        tasks[task_id].r_pin_reqs[j].state = gpio_get(tasks[task_id].r_pin_reqs[j].pin);
+        tasks[task_id].r_pin_reqs[j].value = (void*)gpio_get(tasks[task_id].r_pin_reqs[j].pin);
     }
 }
 
@@ -73,21 +78,21 @@ void __publish_0(int task_id)
     uint8_t w_task_size = w_task_sizes[task_id];
     for (int j = 0; j < w_task_sizes[task_id]; j++)
     {
-        gpio_put(tasks[task_id].w_pin_reqs[j].pin, tasks[task_id].w_pin_reqs[j].state);
+        gpio_put(tasks[task_id].w_pin_reqs[j].pin, (bool*)tasks[task_id].w_pin_reqs[j].value);
     }
 }
 
 void task1_func(int task_id) //full gen
 {
     TaskStatus_t xTaskDetails;
-    __init_0(task_id);
+    __init_spi(task_id);
     while (1)
     {
         TickType_t tick = xTaskGetTickCount();
         printf("tick1 %i", tick);
         __CURRENT_TIME.tv_sec = tick/1000;
         __CURRENT_TIME.tv_nsec = (tick % 1000) * 1000000;
-        __retrieve_0(task_id);
+        __retrieve_spi(task_id);
         RESOURCE1_run__(tick);
         __publish_0(task_id);
         vTaskDelay(5);
@@ -97,6 +102,7 @@ void task1_func(int task_id) //full gen
 void task2_func(int task_id) //full gen
 {
     TaskStatus_t xTaskDetails;
+    __init_uart();
     while (1)
     {
         TickType_t tick = xTaskGetTickCount();
@@ -121,35 +127,8 @@ void __run_task1(unsigned long tick)
     } 
 }
 
-<<<<<<< HEAD
-void __publish_0()
-{
-    for (int i = 0; i < TASK_N; i++)
-    {
-        uint8_t w_task_size = w_task_sizes[i];
-        for (int j = 0; j < w_task_sizes[i]; j++)
-        {
-            switch (tasks[i].w_pin_reqs[j].type)
-            {
-            case GPIO:
-                tasks[i].r_pin_reqs[j].state = gpio_get(tasks[i].r_pin_reqs[j].pin);
-                break;
-            case UART:
-                break;
-            case SPI:
-                break;
-            default:
-                break;
-            }
-            gpio_put(tasks[i].w_pin_reqs[j].pin, tasks[i].w_pin_reqs[j].state);
-        }
-    }
-    //xSemaphoreGive(xMutex);
-}
-=======
 
 
->>>>>>> 1496ae99a8cb0d234d2247d85a147d226d807530
 
 void __cleanup_0()
 {

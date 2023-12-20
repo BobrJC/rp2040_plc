@@ -20,7 +20,6 @@ char *PLC_ID = NULL;
 
 int main() 
 {
-    stdio_init_all();
     sleep_ms(10000);
     init_freertos();
     vTaskStartScheduler();
