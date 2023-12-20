@@ -46,7 +46,6 @@ void __retrieve_spi() //NOT GEN
 
 void __init_0(int task_id)
 {
-    printf("INIT\r\n");
 
     for (int j = 0; j < r_task_sizes[task_id]; j++)
     {
