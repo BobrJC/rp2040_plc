@@ -1,8 +1,7 @@
 // #ifndef PLCH
 // #define PLCH
 #pragma once
-#include "stdbool.h"
-#include "stdint.h"
+#include "structs.h"
 #include "pico/stdlib.h"
 #include <FreeRTOS.h>
 #include <task.h>
@@ -23,24 +22,26 @@
 #define TASK1_R_PIN_1 9 // from csv
 #define TASK1_R_PIN_1_STATE 0 // default
 
-#define TASK1_W_PIN_1 10 // from csv
+#define TASK1_W_PIN_1 0 // from csv
 #define TASK1_W_PIN_1_STATE 0 // default
 
 #define TASK1__MX0_0_2_13 0 // from csv
 
-extern void RESOURCE1_run__(unsigned long tick); //gen
+// ---------- TASK 2 ----------
+#define TASK2_PRIORITY 2 // from resource_X.c
+#define TASK2_RUN RESOURCE2_run__ // from resource_X.c
+#define TASK2_N_W_PIN 1 // from csv (нужно для циклов)
+#define TASK2_N_R_PIN 0 // from csv
 
-typedef struct r_request
-{
-    const uint32_t pin;
-    bool state;
-} r_request_t;
+#define TASK2_R_PIN_1 9 // from csv
+#define TASK2_R_PIN_1_STATE 0 // default
 
-typedef struct w_request
-{
-    const uint32_t pin;
-    bool state;
-} w_request_t;
+#define TASK2_W_PIN_1 0 // from csv
+#define TASK2_W_PIN_1_STATE 0 // default
+
+#define TASK2__MX0_0_2_0 0 // from csv
+
+extern void TASK1_RUN(unsigned long tick); //gen
 
 typedef struct task {
     const uint8_t priority;
@@ -57,7 +58,7 @@ task_t tasks[TASK_N] = {
         .r_pin_reqs = {},
     },
 };
-uint8_t* __MX0_0_2_13 = &(tasks[0].w_pin_reqs[TASK1__MX0_0_2_13].state);  
+uint8_t* __MX0_0_2_13 = &(tasks[0].w_pin_reqs[TASK1__MX0_0_2_13].value);  
 // from csv какой тип будет  ^ (w или r)
 
 const uint8_t r_task_sizes[TASK_N] = {TASK1_N_R_PIN};

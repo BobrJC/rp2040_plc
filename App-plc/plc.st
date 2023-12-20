@@ -20,6 +20,9 @@ PROGRAM program0
   VAR
     LocalVar0 AT %MX0.0.2.13 : BOOL;
   END_VAR
+  VAR
+    LocalVar0 AT %MX0.1.2.13 : BOOL;
+  END_VAR
   VAR CONSTANT
     t_1s : TIME := t#1s;
   END_VAR

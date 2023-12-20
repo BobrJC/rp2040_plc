@@ -15,6 +15,7 @@
         "tuple": "c",
         "type_traits": "c",
         "utility": "c",
+        "structs.h": "c",
         "cmsis_os2.h": "c"
     },
     "workbench.colorCustomizations": {
