@@ -58,7 +58,20 @@ task_t tasks[TASK_N] = {
         .r_pin_reqs = {},
     },
 };
-uint8_t* __MX0_0_2_13 = &(tasks[0].w_pin_reqs[TASK1__MX0_0_2_13].value);  
+
+float MD0_1;  
+float MD0_0;  
+float MD1_0;
+float MD1_1;  
+int MX1_1;  
+
+
+float* __MD0_1 = &MD0_1;  
+float* __MD0_0 = &MD0_0;  
+float* __MD1_0 = &MD1_0;
+float* __MD1_1 = &MD1_1;  
+int* __MX1_1 = &MX1_1;  
+
 // from csv какой тип будет  ^ (w или r)
 
 const uint8_t r_task_sizes[TASK_N] = {TASK1_N_R_PIN};

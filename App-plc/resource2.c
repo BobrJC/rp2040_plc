@@ -5,33 +5,33 @@
 
 #include "iec_std_lib.h"
 
-// RESOURCE RESOURCE1
+// RESOURCE RESOURCE2
 
 extern unsigned long long common_ticktime__;
 
 #include "accessor.h"
 #include "POUS.h"
+
 #include "config.h"
 
+#include "POUS.c"
 
+BOOL TASK0;
+PROGRAM1 RESOURCE2__INSTANCE0;
+#define INSTANCE0 RESOURCE2__INSTANCE0
 
-BOOL TASK1;
-PROGRAM1 RESOURCE1__INSTANCE1;
-#define INSTANCE1 RESOURCE1__INSTANCE1
-
-void RESOURCE1_init__(void) {
+void RESOURCE2_init__(void) {
   BOOL retain;
   retain = 0;
   
-  TASK1 = __BOOL_LITERAL(FALSE);
-  PROGRAM1_init__(&INSTANCE1,retain);
+  TASK0 = __BOOL_LITERAL(FALSE);
+  PROGRAM1_init__(&INSTANCE0,retain);
 }
 
-void RESOURCE1_run__(unsigned long tick) {
-  printf("RESSOURCE1\n");
-  TASK1 = !(tick % 1);
+void RESOURCE2_run__(unsigned long tick) {
+  TASK0 = !(tick % 1);
   if (TASK1) {
-    PROGRAM1_body__(&INSTANCE1);
+    PROGRAM1_body__(&INSTANCE0);
   }
 }
 
