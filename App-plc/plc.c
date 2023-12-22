@@ -25,7 +25,7 @@ void init_freertos() //full gen
     TaskHandle_t task1 = NULL;
     TaskHandle_t task2 = NULL;
     xTaskCreate(task1_func, "1", 1024, (void*)0, 7, &task1);
-    xTaskCreate(task2_func, "2", 256, (void*)1, 7, &task2);
+    //xTaskCreate(task2_func, "2", 256, (void*)1, 7, &task2);
 }
 
 void __init_spi() //NOT GEN
@@ -53,10 +53,7 @@ void __retrieve_adc()
     const float conversion_factor = 3.3f / (1<<12);
     float result = raw * conversion_factor;
     temp = 27 - (result -0.706)/0.001721;
-    printf("Temp_internal = %f C\n", temp);
     MD1_0 = temp;
-    printf("_MD1_0 = %f C\n", MD1_0);
-
     vTaskDelay(200);
 }
 
@@ -70,9 +67,7 @@ void __retrieve_spi() //NOT GEN
     gpio_put(CS, 1);
 
     buf16bit >>= 3;
-    printf("buf = %.2f C \n", buf16bit*0.25);
-    MD0_0 = (float)buf16bit;
-    printf("Temp = %.2f C \n", (MD0_0)*0.25);
+    MD0_0 = (float)buf16bit * 0.25;
     vTaskDelay(200);     
 }
 void __init_uart()
@@ -122,7 +117,11 @@ void task1_func(int task_id) //full gen
         __CURRENT_TIME.tv_nsec = (tick % 1000) * 1000000;
         __retrieve_spi();
         RESOURCE1_run__(tick);
-       
+        printf("_MD0_0 = %f С\n", *__MD0_0);
+        printf("_MD1_0 = %f С\n", *__MD1_0);
+        printf("_MD0_1 = %f F\n", *__MD0_1);
+        printf("_MD1_1 = %f F\n", *__MD1_1);
+        printf("diff %i\r\n", *__MX1_1);
         //__publish_0(task_id);
         vTaskDelay(5);
     }
@@ -140,11 +139,11 @@ void task2_func(int task_id) //full gen
         __CURRENT_TIME.tv_nsec = (tick % 1000) * 1000000;
         __retrieve_adc();
         RESOURCE0_run__(tick);
-        printf("_MD0_0 = %f F\n", *__MD0_0);
-        printf("_MD1_0 = %f F\n", *__MD1_0);
+        printf("_MD0_0 = %f С\n", *__MD0_0);
+        printf("_MD1_0 = %f С\n", *__MD1_0);
         printf("_MD0_1 = %f F\n", *__MD0_1);
         printf("_MD1_1 = %f F\n", *__MD1_1);
-        printf("diff %i\r\n", __MX1_1);
+        printf("diff %i\r\n", *__MX1_1);
         vTaskDelay(5);
     }
 }

@@ -16,7 +16,6 @@ void PROGRAM0_init__(PROGRAM0 *data__, BOOL retain) {
   __INIT_VAR(data__->_TMP_ADD3_OUT,0,retain)
 }
 
-extern float* __MD0_0;
 // Code part
 void PROGRAM0_body__(PROGRAM0 *data__) {
   // Initialise TEMP variables
