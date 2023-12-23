@@ -2,35 +2,38 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <errno.h>
-#include "plc.h"
 #include "stack_macros.h"
 #include "iec_types.h"
+
+#include "plc.h"
+
 #include "FreeRTOS.h"
 #include "timers.h"
 #include "task.h"
-#include "hardware/spi.h"
-#include "hardware/adc.h"
-#include "main.h"
 
-extern IEC_TIME __CURRENT_TIME;
-extern void RESOURCE1_run__(); // gen
-extern void RESOURCE0_run__(); // gen
-void task1_func(); //gen
-void task2_func(); //gen
-uint16_t buf16bit;
-float temp;
+extern IEC_TIME     __CURRENT_TIME;     // gen
+extern void         RESOURCE1_init__(); // gen
+extern void         RESOURCE0_init__(); // gen
+
+extern void         RESOURCE1_run__();  // gen
+extern void         RESOURCE0_run__();  // gen
+
+void                task1_func();       // gen
+void                task2_func();       // gen
+
+uint16_t            buf16bit;           // NOT NEEDED
+float               temp;               // NOT NEEDED
 
 void init_freertos() //full gen
 {
     TaskHandle_t task1 = NULL;
     TaskHandle_t task2 = NULL;
-    xTaskCreate(task1_func, "1", 1024, (void*)0, 7, &task1);
-    //xTaskCreate(task2_func, "2", 256, (void*)1, 7, &task2);
+    xTaskCreate(TASK1_RUN, "1", TASK1_STACK_SIZE, (void*)0, TASK1_PRIORITY, &task1);
+    xTaskCreate(TASK2_RUN, "2", TASK2_STACK_SIZE, (void*)1, TASK2_PRIORITY, &task2);
 }
 
 void __init_spi() //NOT GEN
 {
-    printf("task 1 started");
     stdio_init_all();
     spi_init(SPI_PORT, 500000);
     gpio_set_function(SCK, GPIO_FUNC_SPI);
@@ -40,15 +43,16 @@ void __init_spi() //NOT GEN
     gpio_set_dir(CS, GPIO_OUT);
     gpio_put(CS, 1);
 }
-void __init_adc()
+void __init_adc() //NOT GEN
 {
     adc_init();
     adc_set_temp_sensor_enabled(true);
     adc_select_input(4);
 }
 
-void __retrieve_adc()
+void __retrieve_adc() //NOT GEN
 {
+    /*use value from st code*/
     uint16_t raw = adc_read();
     const float conversion_factor = 3.3f / (1<<12);
     float result = raw * conversion_factor;
@@ -59,22 +63,24 @@ void __retrieve_adc()
 
 void __retrieve_spi() //NOT GEN
 {
+    /*use value from st code*/
     gpio_put (CS, 0);
     vTaskDelay(1); 
     spi_read_blocking(SPI_PORT, 0, &buf16bit, 1);
     buf16bit <<= 8;
     spi_read_blocking(SPI_PORT, 0, &buf16bit, 1);
     gpio_put(CS, 1);
-
     buf16bit >>= 3;
     MD0_0 = (float)buf16bit * 0.25;
     vTaskDelay(200);     
 }
-void __init_uart()
+
+void __init_uart() //NOT GEN
 {
     stdio_init_all();
 }
-void __init_0(int task_id)
+//gen only when needed
+void __init_GPIO(int task_id)
 {
 
     for (int j = 0; j < r_task_sizes[task_id]; j++)
@@ -88,16 +94,16 @@ void __init_0(int task_id)
         gpio_set_dir(tasks[task_id].w_pin_reqs[j].pin, true);
     }
 }
-
-void __retrieve_0(int task_id)
+//gen only when needed
+void __retrieve_GPIO(int task_id)
 {
     for (int j = 0; j < r_task_sizes[task_id]; j++)
     {
         tasks[task_id].r_pin_reqs[j].value = (void*)gpio_get(tasks[task_id].r_pin_reqs[j].pin);
     }
 }
-
-void __publish_0(int task_id)
+//gen only when needed
+void __publish_GPIO(int task_id)
 {
     uint8_t w_task_size = w_task_sizes[task_id];
     for (int j = 0; j < w_task_sizes[task_id]; j++)
@@ -108,29 +114,23 @@ void __publish_0(int task_id)
 
 void task1_func(int task_id) //full gen
 {
-    TaskStatus_t xTaskDetails;
     __init_spi();
+    RESOURCE1_init__();
     while (1)
     {
         TickType_t tick = xTaskGetTickCount();
         __CURRENT_TIME.tv_sec = tick/1000;
         __CURRENT_TIME.tv_nsec = (tick % 1000) * 1000000;
         __retrieve_spi();
-        RESOURCE1_run__(tick);
-        printf("_MD0_0 = %f С\n", *__MD0_0);
-        printf("_MD1_0 = %f С\n", *__MD1_0);
-        printf("_MD0_1 = %f F\n", *__MD0_1);
-        printf("_MD1_1 = %f F\n", *__MD1_1);
-        printf("diff %i\r\n", *__MX1_1);
-        //__publish_0(task_id);
+        tasks[task_id].func(tick);
         vTaskDelay(5);
     }
 }
 
 void task2_func(int task_id) //full gen
 {
-    TaskStatus_t xTaskDetails;
     __init_uart();
+    RESOURCE0_init__();
     __init_adc();
     while (1)
     {
@@ -138,7 +138,7 @@ void task2_func(int task_id) //full gen
         __CURRENT_TIME.tv_sec = tick/1000;
         __CURRENT_TIME.tv_nsec = (tick % 1000) * 1000000;
         __retrieve_adc();
-        RESOURCE0_run__(tick);
+        tasks[task_id].func(tick);
         printf("_MD0_0 = %f С\n", *__MD0_0);
         printf("_MD1_0 = %f С\n", *__MD1_0);
         printf("_MD0_1 = %f F\n", *__MD0_1);
@@ -158,10 +158,7 @@ void __run_task1(unsigned long tick)
         tasks[i].func(tick);
     } 
 }
-
-
-
-
+//gen only when needed
 void __cleanup_0()
 {
 
