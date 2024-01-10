@@ -16,7 +16,10 @@
         "type_traits": "c",
         "utility": "c",
         "structs.h": "c",
-        "cmsis_os2.h": "c"
+        "cmsis_os2.h": "c",
+        "freertos.h": "c",
+        "errno.h": "c",
+        "stdio.h": "c"
     },
     "workbench.colorCustomizations": {
         "activityBar.activeBackground": "#ab307e",
