@@ -31,7 +31,7 @@ def create_csv(folder_path, file_name, column_names, st_files: list[str]):
             csv_file.write(line)
 
     print(f"CSV file '{file_name}' with columns {column_names} created successfully in the folder '{folder_path}'.")
-st_files: list[str] = ["plc.st"]
+st_files: list[str] = ["all_together.st"]
 folder_path = 'TESTFOLDER' 
 file_name = 'board_mapper.csv'
 column_names = ['Task', 'BoardPins', "Direction",'Type', 'Adress']

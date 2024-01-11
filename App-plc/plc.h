@@ -1,80 +1,78 @@
-// #ifndef PLCH
-// #define PLCH
-#pragma once
-#include "structs.h"
+#ifndef PLCH
+#define PLCH
+
 #include "pico/stdlib.h"
 #include <FreeRTOS.h>
-#include <task.h>
 #include <queue.h>
-#include <semphr.h>
+#include "hardware/spi.h"
+#include "hardware/adc.h"
+#include "hardware/uart.h"
+#include "stdint.h"
 
-//SemaphoreHandle_t xMutex;
-
-#define TASK_N 1 // from script (для циклов)
+#define TASK_N 2
 #define MAX_REQS_N 10
 
+// ---------- TASK 0 ----------
+#define TASK0_PRIORITY 7
+#define TASK0_RUN  RESOURCE0_run__
+#define TASK0_STACK_SIZE 256
+#define TASK0_N_R_PIN 0
+#define TASK0_N_W_PIN 0
+
 // ---------- TASK 1 ----------
-#define TASK1_PRIORITY 10 // from resource_X.c
-#define TASK1_RUN RESOURCE1_run__ // from resource_X.c
-#define TASK1_N_W_PIN 1 // from csv (нужно для циклов)
-#define TASK1_N_R_PIN 0 // from csv
+#define TASK1_PRIORITY 7
+#define TASK1_RUN  RESOURCE1_run__
+#define TASK1_STACK_SIZE 256
+#define TASK1_N_R_PIN 0
+#define TASK1_N_W_PIN 0
 
-#define TASK1_R_PIN_1 9 // from csv
-#define TASK1_R_PIN_1_STATE 0 // default
+#define MISO 16
+#define CS 17
+#define SCK 18
+#define SPI_PORT spi0
 
-#define TASK1_W_PIN_1 0 // from csv
-#define TASK1_W_PIN_1_STATE 0 // default
+extern void RESOURCE0_run__(unsigned long tick);
+extern void RESOURCE1_run__(unsigned long tick);
 
-#define TASK1__MX0_0_2_13 0 // from csv
-
-// ---------- TASK 2 ----------
-#define TASK2_PRIORITY 2 // from resource_X.c
-#define TASK2_RUN RESOURCE2_run__ // from resource_X.c
-#define TASK2_N_W_PIN 1 // from csv (нужно для циклов)
-#define TASK2_N_R_PIN 0 // from csv
-
-#define TASK2_R_PIN_1 9 // from csv
-#define TASK2_R_PIN_1_STATE 0 // default
-
-#define TASK2_W_PIN_1 0 // from csv
-#define TASK2_W_PIN_1_STATE 0 // default
-
-#define TASK2__MX0_0_2_0 0 // from csv
-
-extern void TASK1_RUN(unsigned long tick); //gen
 
 typedef struct task {
     const uint8_t priority;
-    w_request_t w_pin_reqs[MAX_REQS_N]; 
-    r_request_t r_pin_reqs[MAX_REQS_N]; 
-    void (*func)(unsigned long); 
+    void (*func)(unsigned long);
 } task_t;
 
 task_t tasks[TASK_N] = {
     {
-        .priority = TASK1_PRIORITY, 
-        .func = TASK1_RUN, 
-        .w_pin_reqs = {{TASK1_W_PIN_1, TASK1_W_PIN_1_STATE},},
-        .r_pin_reqs = {},
+        .priority = TASK0_PRIORITY,
+        .func = TASK0_RUN,
+    },
+    {
+        .priority = TASK1_PRIORITY,
+        .func = TASK1_RUN,
     },
 };
+<<<<<<< HEAD
 float MD0_1;  
 float MD0_0;  
 float MD1_0;
 float MD1_1;  
 int MX1_1;  
+=======
+    
+const uint8_t r_task_sizes[TASK_N] = {TASK0_N_R_PIN,TASK1_N_R_PIN,};
+const uint8_t w_task_sizes[TASK_N] = {TASK0_N_W_PIN,TASK1_N_W_PIN,};
 
+float cel_0;
+float far1;
+float far_from_pair;
+uint8_t res;
+float cel_1;
+float far;
+>>>>>>> e8fe3a3685c67324e5fc45b82bed892c0bc4eaeb
 
-float* __MD0_1 = &MD0_1;  
-float* __MD0_0 = &MD0_0;  
-float* __MD1_0 = &MD1_0;
-float* __MD1_1 = &MD1_1;  
-int* __MX1_1 = &MX1_1;  
+float* __MD1_0 = &cel_0;
+float* __MD1_1 = &far1;
+float* __MD0_1 = &far_from_pair;
+uint8_t* __MX1_1 = &res;
+float* __MD0_0 = &cel_1;
 
-// from csv какой тип будет  ^ (w или r)
-
-const uint8_t r_task_sizes[TASK_N] = {TASK1_N_R_PIN};
-const uint8_t w_task_sizes[TASK_N] = {TASK1_N_W_PIN};
-
-// #endif
-
+#endif
