@@ -1,0 +1,7 @@
+TaskId;Priority;Variable;Address;Type;BoardPins;Direction
+0;7;cel_0;MD1_0;adc;;;
+0;7;far1;MD1_1;;;;
+0;7;far_from_pair;MD0_1;;;;
+0;7;res;MX1_1;;;;
+1;7;cel_1;MD0_0;spi;;;
+1;7;far;MD0_1;;;;
