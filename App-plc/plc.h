@@ -58,7 +58,6 @@ task_t tasks[TASK_N] = {
         .r_pin_reqs = {},
     },
 };
-
 float MD0_1;  
 float MD0_0;  
 float MD1_0;
