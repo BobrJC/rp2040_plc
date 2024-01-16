@@ -42,7 +42,6 @@ def generate_plc_c(tasks):
             for var in task.vars:
                 type = var[2].lower()
                 if type not in used_types and type != 'default':
-                    print(type)
                     if type == 'gpio':
                         if not use_gpio:
                             use_gpio = 1
