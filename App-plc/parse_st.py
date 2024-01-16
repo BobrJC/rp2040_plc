@@ -1,78 +1,63 @@
 import re
-import os
-import copy
-import csv
-class Task:
-    def __init__(self, task_id, addresses, period, period_unit, priority):
-        self.task_id = task_id
-        self.addresses = addresses
-        self.period = period
-        self.period_unit = period_unit
-        self.priority = priority
+from codegen.task import Task
 
-    def csv_line(self):
-        attrs = list(vars(self).items())
-        arr_needed = []
-        for (i, attr) in enumerate(attrs):            
-            attrs[i] = attr[1]
-
-        for address in attrs[1]:
-            item = copy.deepcopy(attrs)
-            item[1] = address
-            arr_needed.append(item)
-
-        csv_lines = [';'.join("%s" % item for item in line) for line in arr_needed]
-        print(csv_lines)
+DEFAULT_ST_FILE_PATH = 'plc.st'
 
 
+def parse_variables(content):
+    variables = []  # list of (var, address)
+
+    var_blocks = re.findall(r'VAR(.*?)END_VAR', content, re.DOTALL)
+    for var_block in var_blocks:
+        variables_in_block = re.finditer(r'(\S+) AT\s+%(\S+)', var_block)
+        for var_match in variables_in_block:
+            variables.append(
+                [var_match.group(1), var_match.group(2).replace('.', '_')])
+
+    return variables
 
 
-def parse_st_file(file_path, task_id=1):
-    tasks = []
-
+def parse_st_file(file_path):
     with open(file_path, 'r') as file:
-        st_code = file.read()
+        content = file.read()
 
-    period_match = re.search(r'INTERVAL\s*:=\s*T#(\d+)(\w*)', st_code)
-    if period_match:
-        period = str(period_match.group(1))
-        period_unit = period_match.group(2).lower() if period_match.group(2) else 'ms'
+    task_objects = []
+    program_var_dict = {}
+    program_matches = re.finditer(
+        r'PROGRAM (\w+)(.*?)END_PROGRAM', content, re.DOTALL)
 
-    priority_match = re.search(r'PRIORITY\s*:=\s*(\d+)', st_code)
-    if priority_match:
-        priority = int(priority_match.group(1))
+    for program in program_matches:
+        program_name = program.group(1)
+        program_content = program.group(2)
+        program_var_dict[program_name] = parse_variables(program_content)
 
-    
-    var_matches = re.finditer(r'(\w+)\s+AT\s+%(\S+)', st_code)
-    addreses = []
-    for var_match in var_matches:
-        local_var_name = var_match.group(1) # спарсил на всякий, если пригодится
-        original_address = var_match.group(2)
-        formatted_address = "__" + original_address.replace('.', '_')
-        addreses.append(formatted_address)
+    resource_matches = re.finditer(
+        r'RESOURCE (\w+)(.*?)END_RESOURCE', content, re.DOTALL)
 
-    
-    task = Task(task_id, addreses, period, period_unit, priority)
-    tasks.append(task)
+    for resource in resource_matches:
+        resource_name = resource.group(1)
+        resource_body = resource.group(2)
 
-    return tasks
+        task_match = re.search(
+            r'TASK (\w+)\(INTERVAL := T#(\d+)(\w+),PRIORITY := (\d+)', resource_body)
+        task_name = task_match.group(1) if task_match else None
 
-st_files = ["plc.st"]
-all_tasks = []
+        interval_value = task_match.group(2) if task_match else None
+        interval_unit = task_match.group(3) if task_match else None
+        priority_value = task_match.group(4) if task_match else None
+        program_name = re.search(
+            r'PROGRAM \w+ WITH (\w+) : (\w+)', resource_body).group(2)
+        task_obj = Task(''.join(filter(str.isdigit, task_name[::-1]))[
+                        ::-1], program_var_dict[program_name], int(interval_value), interval_unit, int(priority_value))
+        task_objects.append(task_obj)
 
-for i, st_file in enumerate(st_files):
-    tasks_in_file = parse_st_file(st_file, i)
-    all_tasks.extend(tasks_in_file)
-        #if not os.path.exists(folder_path):
-        #    os.makedirs(folder_path)
-#
-        #file_path = os.path.join(folder_path, file_name)
-        #with open(file_path, 'w', newline='') as csv_file:
-        #    csv_writer = csv.writer(csv_file, delimiter=';')
-        #    csv_writer.writerow(column_names)
-        #    for line in csv_lines:
-        #        csv_file.write(line)
-#
-        #print(f"CSV file '{file_name}' with columns {column_names} created successfully in the folder '{folder_path}'.")
-for task in all_tasks:
-    task.csv_line()
+    print("ST file parsed successfully.")
+    return sorted(task_objects, key=lambda x: x.task_id)
+
+
+def main():
+    print(parse_st_file(DEFAULT_ST_FILE_PATH))
+
+
+if __name__ == '__main__':
+    main()

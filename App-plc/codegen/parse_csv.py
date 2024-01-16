@@ -1,5 +1,5 @@
 import csv
-from task import Task 
+from codegen.task import Task 
 
 def parse_csv(tasks: list[Task], csv_file_path : str):
     with open(csv_file_path, 'r') as csv_file:

@@ -158,7 +158,7 @@ typedef struct w_request {
     plc_h_content = header + task_define + '\n' + gpio_typedef + '\n' + task_declarations + '\n' + \
         task_definitions + len_defenitions + var_declarations + '\n' + var_pointers + footer
 
-    with open("_plc.h", "w") as file:
+    with open("plc.h", "w") as file:
         file.write(plc_h_content)
 
-    print("_plc.h file created successfully.")
+    print("plc.h file created successfully.")

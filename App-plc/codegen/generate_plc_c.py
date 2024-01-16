@@ -1,7 +1,7 @@
 def generate_plc_c(tasks):
     num_tasks = len(tasks)
 
-    with open("_plc.c", "w") as file:
+    with open("plc.c", "w") as file:
         file.write("#include \"plc.h\"\n")
         file.write("#include \"task.h\"\n\n")
         file.write("#include <stdio.h>\n")
@@ -127,4 +127,4 @@ void __publish_gpio(int task_id)
             file.write("        vTaskDelay(5);\n    }\n}\n\n")
 
     
-        print("_plc.c file created successfully.")
+        print("plc.c file created successfully.")

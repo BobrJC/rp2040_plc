@@ -1,8 +1,8 @@
 import csv
 import sys
-from task import Task
+from codegen.task import Task
 from parse_st import *
-
+from codegen.merge_st import merge_st_files
 COLUMN_NAMES = ['TaskId', 
                 'Priority',
                 'Variable', 
@@ -11,7 +11,7 @@ COLUMN_NAMES = ['TaskId',
                 'BoardPins', 
                 'Direction']
 FILE_NAME = 'board_mapper.csv'
-
+DEFAULT_ST_FILE_PATH = 'plc.st'
 
 def create_csv(tasks: list[Task]):
     csv_lines = []
@@ -29,6 +29,7 @@ def create_csv(tasks: list[Task]):
         f"CSV file '{FILE_NAME}' with columns {COLUMN_NAMES} created successfully.")
 
 def main():
+    #merge_st_files('plc.st', 'generated_plc.st', 'merged.st')
     st_file_path = DEFAULT_ST_FILE_PATH
     if len(sys.argv) > 1:
         st_file_path = sys.argv[1]
