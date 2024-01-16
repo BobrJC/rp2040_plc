@@ -1,24 +1,19 @@
-# RP2040-FreeRTOS Template 1.4.2
+# rp2040_plc на основе RP2040-FreeRTOS Template 1.4.2
 
-This repo contains my base project for [FreeRTOS](https://freertos.org/) on the [Raspberry Pi RP2040 microcontroller](https://www.raspberrypi.com/products/rp2040/). It can be run as a demo and then used as the basis of a new project.
+Данный репозиторий основан на [этом шаблоне](https://github.com/smittytone/RP2040-FreeRTOS)
 
-More details [in this blog post](https://blog.smittytone.net/2022/02/24/how-to-use-freertos-with-the-raspberry-pi-pico/).
+В этом репозитории содерджится [FreeRTOS](https://freertos.org/) для [Raspberry Pi RP2040 microcontroller](https://www.raspberrypi.com/products/rp2040/).
 
-## Project Structure
+Больше деталей [в этом посте](https://blog.smittytone.net/2022/02/24/how-to-use-freertos-with-the-raspberry-pi-pico/).
+
+## Структура проекта
 
 ```
-/RP2040-FreeRTOS
+/rp2040_plc
+|___/App-plc                // Application generation C-code for plc source code (C)
+|   |___CMakeLists.txt      // Application-level CMake config file
 |
 |___/App-Template           // Application 1 (FreeRTOS template) source code (C)
-|   |___CMakeLists.txt      // Application-level CMake config file
-|
-|___/App-Scheduling         // Application 2 (scheduling demo) source code (C++)
-|   |___CMakeLists.txt      // Application-level CMake config file
-|
-|___/App-IRQs               // Application 3 (IRQs demo) source code (C++)
-|   |___CMakeLists.txt      // Application-level CMake config file
-|
-|___/App-Timers             // Application 4 (timers demo) source code (C++)
 |   |___CMakeLists.txt      // Application-level CMake config file
 |
 |___/Common                 // Source code common to applications 2-4 (C++)
@@ -40,24 +35,24 @@ More details [in this blog post](https://blog.smittytone.net/2022/02/24/how-to-u
 |___LICENSE.md
 ```
 
-## Prerequisites
+## Требования
 
-To use the code in this repo, your system must be set up for RP2040 C/C++ development. See [this blog post of mine](https://blog.smittytone.net/2021/02/02/program-raspberry-pi-pico-c-mac/) for setup details.
+Для использования этого репозитория ваша система должна быть готова к разхработке для RP2040 C/C++. [В посте от автора шаблона](https://blog.smittytone.net/2021/02/02/program-raspberry-pi-pico-c-mac/) описаны детали установки.
 
-## Usage
+## Использование
 
-1. Clone the repo: `git clone https://github.com/smittytone/RP2040-FreeRTOS`.
-1. Enter the repo: `cd RP2040-FreeRTOS`.
-1. Install the submodules: `git submodule update --init --recursive`.
-1. Optionally, edit `CMakeLists.txt` and `/<Application>/CMakeLists.txt` to rename the project.
-1. Optionally, manually configure the build process: `cmake -S . -B build/`.
-1. Optionally, manually build the app: `cmake --build build`.
-1. Connect your device so it’s ready for file transfer.
-1. Install the app: `./deploy.sh`.
-    * Pass the app you wish to deplopy:
+1. Склонируйте этот репозиторий: `git clone https://github.com/BobrJC/rp2040_plc`.
+1. Войдите в него: `cd rp2040_plc`.
+1. Установите дочерние модули: `git submodule update --init --recursive`.
+1. Опционально измените `CMakeLists.txt` и `/<Application>/CMakeLists.txt` чтобы переименовать проект или подключить другие библиотеки.
+1. Опционально самостоятельно сконфигурируйте сборку: `cmake -S . -B build/`.
+1. Опционально соберите проект: `cmake --build build`.
+1. Подключите свою плату (с зажатой кнопкой boot).
+1. Установите приложение: `./deploy.sh`.
+    * Передайте параметром приложение, которое хотите загрузить:
         * `./deploy.sh build/App-Template/TEMPLATE.uf2`.
         * `./deploy.sh build/App-Scheduling/SCHEDULING_DEMO.uf2`.
-    * To trigger a build, include the `--build` or `-b` flag: `./deploy.sh -b`.
+    * Чтобы в процессе загрузки собрать приложение добавьте флаг `--build` или `-b`: `./deploy.sh -b`.
 
 ## Debug vs Release
 
@@ -91,22 +86,6 @@ This C app provides a simple flip-flop using an on-board LED and an LED wired be
 ![Circuit layout](./images/plus.png)
 
 The code demonstrates a basic FreeRTOS setup, but you can replace it entirely with your own code if you’re using this repo’s contents as a template for your own projects.
-
-### App Two: Scheduling
-
-This C++ app builds on the first by adding an MCP9808 temperature sensor and an HT16K33-based LED display. It is used in [this blog post](https://blog.smittytone.net/2022/03/04/further-fun-with-freertos-scheduling/).
-
-![Circuit layout](./images/scheduler.png)
-
-### App Three: IRQs
-
-This C++ app builds on the second by using the MCP9808 temperature sensor to trigger an interrupt. It is used in [this blog post](https://blog.smittytone.net/2022/03/20/fun-with-freertos-and-pi-pico-interrupts-semaphores-notifications/).
-
-![Circuit layout](./images/irqs.png)
-
-### App Four: Timers
-
-This C++ app provides an introduction to FreeRTOS’ software timers. No extra hardware is required. It is used in [this blog post](https://blog.smittytone.net/2022/06/14/fun-with-freertos-and-the-pi-pico-timers/).
 
 ## IDEs
 
